@@ -15,5 +15,5 @@ INSERT INTO animals(
 
 INSERT INTO animals(
 	id, name, date_of_birth, escape_attempts, neutered, weight_kg)
-	values( 4, 'Devimon', 'May 12, 2017', 5, true, 15);
+	values( 4, 'Devimon', 'May 12, 2017', 5, true, 11);
 	
