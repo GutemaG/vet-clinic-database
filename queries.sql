@@ -8,3 +8,46 @@ SELECT name, escape_attempts FROM animals WHERE weight_kg > 10.5;
 SELECT * FROM animals WHERE neutered is TRUE;
 SELECT * FROM animals WHERE name NOT LIKE 'Gabumon';
 SELECT * FROM animals WHERE weight_kg >=10.4 and weight_kg <=17.3;
+
+-- Transactions
+BEGIN;
+UPDATE animals SET species = 'unspecified';
+SELECT * FROM animals; --verifying
+ROLLBACK;
+
+BEGIN;
+UPDATE animals SET species = 'digimon' WHERE name like '%mon';
+SELECT * FROM animals;
+UPDATE animals SET species = 'pokemon' WHERE species IS NULL;
+SELECT * FROM animals;
+COMMIT;
+SELECT * FROM animals; --VERIFYING
+
+BEGIN;
+DELETE FROM animals;
+ROLLBACK;
+
+BEGIN;
+DELETE FROM animals WHERE date_of_birth > '2022-01-01';
+SAVEPOINT delete_after_Jun;
+UPDATE animals SET weight_kg = weight_kg * -1;
+ROLLBACK TO SAVEPOINT delete_after_Jun;
+UPDATE animals SET weight_kg = weight_kg * -1 WHERE weight_kg < 0;
+COMMIT;
+
+-- Questions
+--How many animals are there?
+SELECT COUNT(*) AS number_of_animals from animals;
+--How many animals have never tried to escape?
+SELECT COUNT(*) AS number_of_animals from animals WHERE escape_attempts = 0;
+--What is the average weight of animals?
+SELECT AVG(weight_kg)::numeric(10,2) FROM animals;
+--Who escapes the most, neutered or not neutered animals?
+SELECT * FROM animals WHERE escape_attempts = ( SELECT MAX (escape_attempts) FROM animals);
+-- What is the minimum and maximum weight of each type of animal?
+SELECT MAX(weight_kg) as max_weight, MIN(weight_kg) as min_weight FROM animals; 
+-- What is the average number of escape attempts per animal type of those born between 1990 and 2000?
+SELECT species, AVG(escape_attempts)::numeric(10,2) 
+    AS average_attempts FROM animals 
+    where date_of_birth BETWEEN '1990-01-01' AND '2000-01-01'
+    GROUP BY species;
